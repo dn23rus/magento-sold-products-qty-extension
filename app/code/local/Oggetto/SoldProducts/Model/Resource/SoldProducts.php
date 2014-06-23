@@ -56,10 +56,10 @@ class Oggetto_SoldProducts_Model_Resource_SoldProducts extends Mage_Core_Model_R
         $select = $this->getReadConnection()->select()
             ->from(
                 array('order_item' => $this->getTable('sales/order_item')),
-                array('qty' => new Zend_Db_Expr('SUM(order_item.qty_ordered)'), 'order_item.created_at')
+                array('qty' => new Zend_Db_Expr('SUM(order_item.qty_ordered)'))
             )
             ->where('product_id = ?', $productId, Zend_Db::INT_TYPE)
-            ->having("(TO_DAYS('{$currentDate}') - TO_DAYS(order_item.created_at)) <= {$period}")
+            ->where("(TO_DAYS('{$currentDate}') - TO_DAYS(order_item.created_at)) <= {$period}")
             ;
         return $this->getReadConnection()->fetchOne($select);
     }
