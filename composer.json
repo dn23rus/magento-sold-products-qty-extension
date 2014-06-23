@@ -16,7 +16,7 @@
         "map": [
             ["app/code/local/Oggetto/SoldProducts", "app/code/local/Oggetto/SoldProducts"],
             ["app/etc/modules/Oggeto_SoldProducts.xml", "app/etc/modules/Oggeto_SoldProducts.xml"],
-            ["app/locale/ru_RU/Oggeto_SoldProducts.csv", "app/locale/ru_RU/Oggeto_SoldProducts.csv"]
+            ["app/locale", "app/locale"]
         ]
     }
 }
