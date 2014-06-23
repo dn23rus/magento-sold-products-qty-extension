@@ -15,7 +15,7 @@
     "extra": {
         "map": [
             ["app/code/local/Oggetto/SoldProducts", "app/code/local/Oggetto/SoldProducts"],
-            ["app/etc/modules/Oggeto_SoldProducts.xml", "app/etc/modules/Oggeto_SoldProducts.xml"],
+            ["app/etc/modules/Oggetto_SoldProducts.xml", "app/etc/modules/Oggetto_SoldProducts.xml"],
             ["app/locale", "app/locale"]
         ]
     }
