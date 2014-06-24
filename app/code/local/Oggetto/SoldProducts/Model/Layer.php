@@ -48,7 +48,6 @@ class Oggetto_SoldProducts_Model_Layer extends Mage_Catalog_Model_Layer
                 'sold_qty_threshold',
                 'sold_qty_extra'
             ), 'left');
-            Mage::helper('oggetto_soldproducts')->initCollectionQtyResults($collection);
         }
         return $this;
     }

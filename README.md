@@ -21,13 +21,13 @@ Paste in your catalog/product/view.phtml following code:
 paste in catalog/product/list.phtml
 
 ```php
-$showOnCategoryPage = $this->helper('oggetto_soldproducts')->doShowOnCategoryPage();
+Mage::helper('oggetto_soldproducts')->initCollectionQtyResults($_productCollection);
 ```
 
 and
 
 ```php
-<?php if ($showOnCategoryPage && $this->helper('oggetto_soldproducts')->doShowSoldProductsQty($_product, true)): ?>
+<?php if ($this->helper('oggetto_soldproducts')->doShowSoldProductsQty($_product, true)): ?>
     <p>
         <?php echo $this->__(
             '%d item(s) sold in the last %d day(s)',

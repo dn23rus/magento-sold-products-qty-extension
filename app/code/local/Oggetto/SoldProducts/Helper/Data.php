@@ -45,7 +45,7 @@ class Oggetto_SoldProducts_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function initCollectionQtyResults(Mage_Eav_Model_Entity_Collection_Abstract $productCollection)
     {
-        if ($productCollection->count()) {
+        if ($this->doShowOnCategoryPage() && $productCollection->count()) {
             $this->_getSoldProductsModel($productCollection->getFirstItem())
                 ->initQtyResults($productCollection->getAllIds());
         }
@@ -70,6 +70,9 @@ class Oggetto_SoldProducts_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function doShowSoldProductsQty(Mage_Catalog_Model_Product $product, $isCategoryPage = false)
     {
+        if ($isCategoryPage && !$this->doShowOnCategoryPage()) {
+            return false;
+        }
         $soldProductsModel = $this->_getSoldProductsModel($product);
         if ($soldProductsModel->isSupportedProductType()) {
             if (null === ($enabled = $product->getData('sold_qty_enable'))) {
