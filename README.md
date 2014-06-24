@@ -18,7 +18,7 @@ Paste in your catalog/product/view.phtml following code:
 
 ### Category page:
 
-add
+paste in catalog/product/list.phtml
 
 ```php
 $showOnCategoryPage = $this->helper('oggetto_soldproducts')->doShowOnCategoryPage();
