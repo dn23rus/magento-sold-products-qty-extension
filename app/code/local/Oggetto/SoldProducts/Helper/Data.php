@@ -33,59 +33,81 @@
 class Oggetto_SoldProducts_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
-     * @var array
+     * @var Oggetto_SoldProducts_Model_SoldProducts
      */
-    protected $_productTypes = array(
-        'simple'
-    );
+    protected $_soldProductsModel;
 
     /**
-     * @var array|null
-     */
-    protected $_qtyResults;
-
-    /**
-     * Do show sold products qty
+     * Load qty data for collection items
      *
-     * @param Mage_Catalog_Model_Product $product product instance
+     * @param Mage_Eav_Model_Entity_Collection_Abstract $productCollection product collection
+     * @return Oggetto_SoldProducts_Helper_Data
+     */
+    public function initCollectionQtyResults(Mage_Eav_Model_Entity_Collection_Abstract $productCollection)
+    {
+        if ($productCollection->count()) {
+            $this->_getSoldProductsModel($productCollection->getFirstItem())
+                ->initQtyResults($productCollection->getAllIds());
+        }
+    }
+
+    /**
+     * Show on category page
+     *
      * @return bool
      */
-    public function doShowSoldProductsQyt(Mage_Catalog_Model_Product $product)
+    public function doShowOnCategoryPage()
     {
-        if ($this->isSupportedType($product)) {
-            if (null === $enabled = $product->getData('sold_qty_enable')) {
+        return Mage::getStoreConfigFlag('sold_products/default_settings/show_on_category_page');
+    }
+
+    /**
+     * Check if show sold products qty
+     *
+     * @param Mage_Catalog_Model_Product $product        product instance
+     * @param bool                       $isCategoryPage use in category page
+     * @return bool
+     */
+    public function doShowSoldProductsQty(Mage_Catalog_Model_Product $product, $isCategoryPage = false)
+    {
+        $soldProductsModel = $this->_getSoldProductsModel($product);
+        if ($soldProductsModel->isSupportedProductType()) {
+            if (null === ($enabled = $product->getData('sold_qty_enable'))) {
                 $enabled = Mage::getStoreConfigFlag('sold_products/default_settings/enabled');
             }
-            return $enabled && ($this->_getSoldProductsQty($product) >= $this->getThreshold($product));
+            return $enabled &&
+                $soldProductsModel->getSoldQtyReal(!$isCategoryPage) > $soldProductsModel->getThreshold();
         }
         return false;
     }
 
     /**
-     * Get sold products qty
+     * Get sold products model
      *
-     * @param Mage_Catalog_Model_Product $product product
-     * @return int
+     * @param Mage_Catalog_Model_Product $product product instance
+     * @return Oggetto_SoldProducts_Model_SoldProducts
      */
-    protected function _getSoldProductsQty(Mage_Catalog_Model_Product $product)
+    protected function _getSoldProductsModel(Mage_Catalog_Model_Product $product)
     {
-        if (!isset($this->_qtyResults[$product->getId()])) {
-            $this->_qtyResults[$product->getId()] =
-                (int) Mage::getResourceSingleton('oggetto_soldproducts/soldProducts')
-                        ->getSoldProductsQty($product->getId(), $this->getPeriod($product));
+        if (null === $this->_soldProductsModel) {
+            $this->_soldProductsModel = Mage::getModel('oggetto_soldproducts/soldProducts');
         }
-        return $this->_qtyResults[$product->getId()];
+        $this->_soldProductsModel->setProduct($product);
+        return $this->_soldProductsModel;
     }
 
     /**
      * Get sold products qty to show on front
      *
-     * @param Mage_Catalog_Model_Product $product product
+     * @param Mage_Catalog_Model_Product $product        product
+     * @param bool                       $isCategoryPage use in category page
      * @return bool|string
      */
-    public function getSoldProductsQty(Mage_Catalog_Model_Product $product)
+    public function getSoldProductsQty(Mage_Catalog_Model_Product $product, $isCategoryPage = false)
     {
-        return $this->_getSoldProductsQty($product) + $this->getExtraQty($product);
+        return $isCategoryPage ?
+            $this->_getSoldProductsModel($product)->getSoldQtyForCategoryPage() :
+            $this->_getSoldProductsModel($product)->getSoldQty();
     }
 
     /**
@@ -96,68 +118,6 @@ class Oggetto_SoldProducts_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getPeriod(Mage_Catalog_Model_Product $product)
     {
-        return $this->_getNumericData(
-            $product,
-            'sold_qty_period',
-            Mage::getStoreConfig('sold_products/default_settings/period')
-        );
-    }
-
-    /**
-     * Get threshold
-     *
-     * @param Mage_Catalog_Model_Product $product product
-     * @return int
-     */
-    public function getThreshold(Mage_Catalog_Model_Product $product)
-    {
-        return $this->_getNumericData(
-            $product,
-            'sold_qty_threshold',
-            Mage::getStoreConfig('sold_products/default_settings/qty_threshold')
-        );
-    }
-
-    /**
-     * Get extra qty
-     *
-     * @param Mage_Catalog_Model_Product $product product
-     * @return int
-     */
-    public function getExtraQty(Mage_Catalog_Model_Product $product)
-    {
-        return $this->_getNumericData(
-            $product,
-            'sold_qty_extra',
-            Mage::getStoreConfig('sold_products/default_settings/extra_qty')
-        );
-    }
-
-    /**
-     * Retrieve numeric attribute value
-     *
-     * @param Mage_Catalog_Model_Product $product      product
-     * @param string                     $attribute    attribute code
-     * @param int|string                 $defaultValue default value
-     * @return int
-     */
-    protected function _getNumericData($product, $attribute, $defaultValue)
-    {
-        $value = $product->getData($attribute);
-        if (!is_numeric($value)) {
-            $value = $defaultValue;
-        }
-        return (int) $value;
-    }
-
-    /**
-     * Check if product type is supported
-     *
-     * @param Mage_Catalog_Model_Product $product product
-     * @return bool
-     */
-    public function isSupportedType(Mage_Catalog_Model_Product $product)
-    {
-        return in_array($product->getTypeId(), $this->_productTypes);
+        return $this->_getSoldProductsModel($product)->getPeriod();
     }
 }
