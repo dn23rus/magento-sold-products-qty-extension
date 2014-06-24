@@ -33,6 +33,8 @@
 class Oggetto_SoldProducts_Model_Resource_SoldProducts extends Mage_Core_Model_Resource_Db_Abstract
 {
     /**
+     * We have period as days, so multiply it by number of seconds in day
+     *
      * @var int
      */
     protected $_periodMultiplier = 86400;

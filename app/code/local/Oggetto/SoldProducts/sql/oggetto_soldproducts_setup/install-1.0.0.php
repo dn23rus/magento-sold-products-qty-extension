@@ -58,6 +58,7 @@ try {
             'sort_order'    => 30,
         ),
     );
+
     foreach ($attributes as $attribute => $specification) {
         $specification['group'] = 'Sold Products QTY';
         $specification['user_defined'] = false;
